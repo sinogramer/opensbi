@@ -13,6 +13,7 @@
 #include <sbi/sbi_error.h>
 #include <sbi/sbi_string.h>
 #include <sbi/sbi_trap.h>
+#include <sbi/sbi_ecall_custom_mcount.h>
 
 extern struct sbi_ecall_extension *const sbi_ecall_exts[];
 
@@ -170,6 +171,8 @@ int sbi_ecall_init(void)
 	int ret;
 	struct sbi_ecall_extension *ext;
 	unsigned long i;
+
+	sbi_ecall_custom_mcount_register_extensions();
 
 	for (i = 0; sbi_ecall_exts[i]; i++) {
 		ext = sbi_ecall_exts[i];
