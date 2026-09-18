@@ -1,0 +1,18 @@
+FIT description: Configuration to load OpenSBI before U-Boot
+Created:         Wed Jul 15 17:16:53 2026
+ Image 0 (opensbi)
+  Description:  OpenSBI fw_dynamic Firmware
+  Created:      Wed Jul 15 17:16:53 2026
+  Type:         Firmware
+  Compression:  uncompressed
+  Data Size:    269872 Bytes = 263.55 KiB = 0.26 MiB
+  Architecture: RISC-V
+  OS:           RISC-V OpenSBI
+  Load Address: 0x100000000
+  Hash algo:    crc32
+  Hash value:   c7860485
+ Default Configuration: 'config_1'
+ Configuration 0 (config_1)
+  Description:  opensbi FIT config
+  Kernel:       unavailable
+  Firmware:     opensbi
