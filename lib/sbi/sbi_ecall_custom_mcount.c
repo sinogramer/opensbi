@@ -22,6 +22,7 @@
 #define FID_CLEAR_ENABLE    10
 #define FID_CLEAR_BOTH      11
 
+#define FID_ACTIVATE_COUNTER 12
 
 static int my_handler(unsigned long extid, 
                       unsigned long fid,
@@ -159,6 +160,23 @@ static int my_handler(unsigned long extid,
                 : "=r"(old_value)
                 : "r"(value));
             sbi_printf("[OpenSBI] Clear mcounteren = 0x%lx (old: 0x%lx, new: 0x%lx)\n", value, old_value, old_value & ~value);
+            old_value = 0; // Reset old_value to avoid confusion in the output
+            break;
+        
+        case FID_ACTIVATE_COUNTER:
+            value = regs->a0;
+            __asm__ __volatile__(
+                "csrrc %0, mcountinhibit, %1" 
+                : "=r"(old_value)
+                : "r"(value));
+            sbi_printf("[OpenSBI] Clear mcountinhibit = 0x%lx (old: 0x%lx, new: 0x%lx)\n", value, old_value, old_value & ~value);
+
+            value = regs->a1;
+            __asm__ __volatile__(
+                "csrrs %0, mcounteren, %1" 
+                : "=r"(old_value)
+                : "r"(value));
+            sbi_printf("[OpenSBI] Set mcounteren = 0x%lx (old: 0x%lx, new: 0x%lx)\n", value, old_value, value | old_value);
             old_value = 0; // Reset old_value to avoid confusion in the output
             break;
         
