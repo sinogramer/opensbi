@@ -29,8 +29,7 @@ static int my_handler(unsigned long extid,
                       struct sbi_ecall_return *out)
 {
     unsigned long value = 0;
-    unsigned long old_value1 = 0;
-    unsigned long old_value2 = 0;
+    unsigned long old_value = 0;
     out->skip_regs_update = false;
     out->value = 0;
 
@@ -39,131 +38,135 @@ static int my_handler(unsigned long extid,
             value = regs->a0;
             __asm__ __volatile__(
                 "csrrw %0, mcountinhibit, %1" 
-                : "=r"(old_value1)
+                : "=r"(old_value)
                 : "r"(value)
             );
-            sbi_printf("[OpenSBI] Write mcountinhibit = 0x%lx (old: 0x%lx)\n", value, old_value1);
+            sbi_printf("[OpenSBI] Write mcountinhibit = 0x%lx (old: 0x%lx)\n", value, old_value);
             break;
         
         case FID_WRITE_ENABLE:
             value = regs->a1;
             __asm__ __volatile__(
                 "csrrw %0, mcounteren, %1" 
-                : "=r"(old_value2)
+                : "=r"(old_value)
                 : "r"(value)
             );
-            sbi_printf("[OpenSBI] Write mcounteren = 0x%lx (old: 0x%lx)\n", value, old_value2);
+            sbi_printf("[OpenSBI] Write mcounteren = 0x%lx (old: 0x%lx)\n", value, old_value);
             break;
 
         case FID_WRITE_BOTH:
             value = regs->a0;
             __asm__ __volatile__(
                 "csrrw %0, mcountinhibit, %1" 
-                : "=r"(old_value1)
+                : "=r"(old_value)
                 : "r"(value)
             );
-            sbi_printf("[OpenSBI] Write mcountinhibit = 0x%lx (old: 0x%lx)\n", value, old_value1);
+            sbi_printf("[OpenSBI] Write mcountinhibit = 0x%lx (old: 0x%lx)\n", value, old_value);
             value = regs->a1;
             
             __asm__ __volatile__(
                 "csrrw %0, mcounteren, %1" 
-                : "=r"(old_value2)
+                : "=r"(old_value)
                 : "r"(value)
             );
-            sbi_printf("[OpenSBI] Write mcounteren = 0x%lx (old: 0x%lx)\n", value, old_value2);
+            sbi_printf("[OpenSBI] Write mcounteren = 0x%lx (old: 0x%lx)\n", value, old_value);
+            old_value = 0; // Reset old_value to avoid confusion in the output
             break;
         
         case FID_READ_INHIBIT:
-            __asm__ __volatile__("csrr %0, mcountinhibit" : "=r"(old_value1));
-            sbi_printf("[OpenSBI] Read mcountinhibit = 0x%lx\n", old_value1);
+            __asm__ __volatile__("csrr %0, mcountinhibit" : "=r"(old_value));
+            sbi_printf("[OpenSBI] Read mcountinhibit = 0x%lx\n", old_value);
             break;
         
         case FID_READ_ENABLE:
-            __asm__ __volatile__("csrr %0, mcounteren" : "=r"(old_value2));
-            sbi_printf("[OpenSBI] Read mcounteren = 0x%lx\n", old_value2);
+            __asm__ __volatile__("csrr %0, mcounteren" : "=r"(old_value));
+            sbi_printf("[OpenSBI] Read mcounteren = 0x%lx\n", old_value);
             break;
 
         case FID_READ_BOTH:
-            __asm__ __volatile__("csrr %0, mcountinhibit" : "=r"(old_value1));
-            sbi_printf("[OpenSBI] Read mcountinhibit = 0x%lx\n", old_value1);
+            __asm__ __volatile__("csrr %0, mcountinhibit" : "=r"(old_value));
+            sbi_printf("[OpenSBI] Read mcountinhibit = 0x%lx\n", old_value);
 
-            __asm__ __volatile__("csrr %0, mcounteren" : "=r"(old_value2));
-            sbi_printf("[OpenSBI] Read mcounteren = 0x%lx\n", old_value2);
+            __asm__ __volatile__("csrr %0, mcounteren" : "=r"(old_value));
+            sbi_printf("[OpenSBI] Read mcounteren = 0x%lx\n", old_value);
+            old_value = 0; // Reset old_value to avoid confusion in the output
             break;
 
         case FID_SET_INHIBIT:
             value = regs->a0;
             __asm__ __volatile__(
                 "csrrs %0, mcountinhibit, %1" 
-                : "=r"(old_value1)
+                : "=r"(old_value)
                 : "r"(value));
-            sbi_printf("[OpenSBI] Set mcountinhibit = 0x%lx (old: 0x%lx, new: 0x%lx)\n", value, old_value1, value | old_value1);
+            sbi_printf("[OpenSBI] Set mcountinhibit = 0x%lx (old: 0x%lx, new: 0x%lx)\n", value, old_value, value | old_value);
             break;
         
         case FID_SET_ENABLE:
             value = regs->a1;
             __asm__ __volatile__(
                 "csrrs %0, mcounteren, %1" 
-                : "=r"(old_value2)
+                : "=r"(old_value)
                 : "r"(value));
-            sbi_printf("[OpenSBI] Set mcounteren = 0x%lx (old: 0x%lx, new: 0x%lx)\n", value, old_value2, value | old_value2);
+            sbi_printf("[OpenSBI] Set mcounteren = 0x%lx (old: 0x%lx, new: 0x%lx)\n", value, old_value, value | old_value);
             break;
 
         case FID_SET_BOTH:
             value = regs->a0;
             __asm__ __volatile__(
                 "csrrs %0, mcountinhibit, %1" 
-                : "=r"(old_value1)
+                : "=r"(old_value)
                 : "r"(value));
-            sbi_printf("[OpenSBI] Set mcountinhibit = 0x%lx (old: 0x%lx, new: 0x%lx)\n", value, old_value1, value | old_value1);
+            sbi_printf("[OpenSBI] Set mcountinhibit = 0x%lx (old: 0x%lx, new: 0x%lx)\n", value, old_value, value | old_value);
 
             value = regs->a1;
             __asm__ __volatile__(
                 "csrrs %0, mcounteren, %1" 
-                : "=r"(old_value2)
+                : "=r"(old_value)
                 : "r"(value));
-            sbi_printf("[OpenSBI] Set mcounteren = 0x%lx (old: 0x%lx, new: 0x%lx)\n", value, old_value2, value | old_value2);
+            sbi_printf("[OpenSBI] Set mcounteren = 0x%lx (old: 0x%lx, new: 0x%lx)\n", value, old_value, value | old_value);
+            old_value = 0; // Reset old_value to avoid confusion in the output
             break;
 
         case FID_CLEAR_INHIBIT:
             value = regs->a0;
             __asm__ __volatile__(
                 "csrrc %0, mcountinhibit, %1" 
-                : "=r"(old_value1)
+                : "=r"(old_value)
                 : "r"(value));
-            sbi_printf("[OpenSBI] Clear mcountinhibit = 0x%lx (old: 0x%lx, new: 0x%lx)\n", value, old_value1, old_value1 & ~value);
+            sbi_printf("[OpenSBI] Clear mcountinhibit = 0x%lx (old: 0x%lx, new: 0x%lx)\n", value, old_value, old_value & ~value);
             break;
 
         case FID_CLEAR_ENABLE:
             value = regs->a1;
             __asm__ __volatile__(
                 "csrrc %0, mcounteren, %1" 
-                : "=r"(old_value2)
+                : "=r"(old_value)
                 : "r"(value));
-            sbi_printf("[OpenSBI] Clear mcounteren = 0x%lx (old: 0x%lx, new: 0x%lx)\n", value, old_value2, old_value2 & ~value);
+            sbi_printf("[OpenSBI] Clear mcounteren = 0x%lx (old: 0x%lx, new: 0x%lx)\n", value, old_value, old_value & ~value);
             break;
 
         case FID_CLEAR_BOTH:
             value = regs->a0;
             __asm__ __volatile__(
                 "csrrc %0, mcountinhibit, %1" 
-                : "=r"(old_value1)
+                : "=r"(old_value)
                 : "r"(value));
-            sbi_printf("[OpenSBI] Clear mcountinhibit = 0x%lx (old: 0x%lx, new: 0x%lx)\n", value, old_value1, old_value1 & ~value);
+            sbi_printf("[OpenSBI] Clear mcountinhibit = 0x%lx (old: 0x%lx, new: 0x%lx)\n", value, old_value, old_value & ~value);
 
             value = regs->a1;
             __asm__ __volatile__(
                 "csrrc %0, mcounteren, %1" 
-                : "=r"(old_value2)
+                : "=r"(old_value)
                 : "r"(value));
-            sbi_printf("[OpenSBI] Clear mcounteren = 0x%lx (old: 0x%lx, new: 0x%lx)\n", value, old_value2, old_value2 & ~value);
+            sbi_printf("[OpenSBI] Clear mcounteren = 0x%lx (old: 0x%lx, new: 0x%lx)\n", value, old_value, old_value & ~value);
+            old_value = 0; // Reset old_value to avoid confusion in the output
             break;
         
         default:
             return SBI_ERR_NOT_SUPPORTED;
     }
 
-    out->value = (old_value1 << 32) | (old_value2 & 0xFFFFFFFF);
+    out->value = old_value;
 
     return SBI_SUCCESS;
 }
