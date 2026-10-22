@@ -40,8 +40,7 @@ static int my_handler(unsigned long extid,
             __asm__ __volatile__(
                 "csrrw %0, mcountinhibit, %1" 
                 : "=r"(old_value)
-                : "r"(value)
-            );
+                : "r"(value));
             sbi_printf("[OpenSBI] Write mcountinhibit = 0x%lx (old: 0x%lx)\n", value, old_value);
             break;
         
@@ -50,8 +49,7 @@ static int my_handler(unsigned long extid,
             __asm__ __volatile__(
                 "csrrw %0, mcounteren, %1" 
                 : "=r"(old_value)
-                : "r"(value)
-            );
+                : "r"(value));
             sbi_printf("[OpenSBI] Write mcounteren = 0x%lx (old: 0x%lx)\n", value, old_value);
             break;
 
@@ -60,16 +58,14 @@ static int my_handler(unsigned long extid,
             __asm__ __volatile__(
                 "csrrw %0, mcountinhibit, %1" 
                 : "=r"(old_value)
-                : "r"(value)
-            );
+                : "r"(value));
             sbi_printf("[OpenSBI] Write mcountinhibit = 0x%lx (old: 0x%lx)\n", value, old_value);
             value = regs->a1;
             
             __asm__ __volatile__(
                 "csrrw %0, mcounteren, %1" 
                 : "=r"(old_value)
-                : "r"(value)
-            );
+                : "r"(value));
             sbi_printf("[OpenSBI] Write mcounteren = 0x%lx (old: 0x%lx)\n", value, old_value);
             old_value = 0; // Reset old_value to avoid confusion in the output
             break;
@@ -166,10 +162,10 @@ static int my_handler(unsigned long extid,
         case FID_ACTIVATE_COUNTER:
             value = regs->a0;
             __asm__ __volatile__(
-                "csrrc %0, mcountinhibit, %1" 
+                "csrrw %0, mcountinhibit, %1" 
                 : "=r"(old_value)
                 : "r"(value));
-            sbi_printf("[OpenSBI] Clear mcountinhibit = 0x%lx (old: 0x%lx, new: 0x%lx)\n", value, old_value, old_value & ~value);
+            sbi_printf("[OpenSBI] Write mcountinhibit = 0x%lx (old: 0x%lx)\n", value, old_value);
 
             value = regs->a1;
             __asm__ __volatile__(
